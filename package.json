@@ -1,0 +1,21 @@
+{
+  "name": "ai-phishing-project",
+  "version": "1.0.0",
+  "description": "A full-stack AI-powered cybersecurity platform that detects phishing attacks, analyzes human behavior risk, and educates users in real-time.",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "npm install --prefix frontend && npm install --prefix backend && cd ai-service && pip install -r requirements.txt",
+    "start:frontend": "npm run dev --prefix frontend",
+    "start:backend": "npm start --prefix backend",
+    "start:ai": "cd ai-service && python -m uvicorn main:app --reload --port 8000",
+    "start:all": "concurrently \"npm run start:frontend\" \"npm run start:backend\" \"npm run start:ai\"",
+    "start": "npm run start:all"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
