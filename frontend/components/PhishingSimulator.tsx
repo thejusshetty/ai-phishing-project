@@ -30,6 +30,10 @@ const runLocalScanner = (senderEmail: string, urlText: string, emailText: string
     wellsfargo: ["wellsfargo.com"],
     bankofamerica: ["bankofamerica.com"]
   };
+
+  const freeEmailProviders = [
+    "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "protonmail.com", "mail.com", "zoho.com", "yandex.com"
+  ];
   
   let isPhishing = false;
   let score = 5.0; // base score for standard safe emails
@@ -41,11 +45,20 @@ const runLocalScanner = (senderEmail: string, urlText: string, emailText: string
   let suspiciousWords: string[] = [];
   
   // Keyword scanning
-  const keywords = ["urgent", "verify", "click here", "suspend", "password", "login", "unauthorized", "account", "update", "action required"];
+  const keywords = ["urgent", "verify", "click here", "suspend", "password", "login", "unauthorized", "account", "update", "action required", "billing", "reset", "free", "win", "claim", "refund", "invoice"];
   const lowerText = emailText.toLowerCase();
   keywords.forEach(w => {
     if (lowerText.includes(w)) suspiciousWords.push(w);
   });
+  
+  // Calculate base score from keywords
+  if (suspiciousWords.length === 1) {
+    score = 25.0;
+  } else if (suspiciousWords.length === 2) {
+    score = 45.0;
+  } else if (suspiciousWords.length >= 3) {
+    score = 65.0;
+  }
   
   // Clean domains helper
   const getDomain = (url: string) => {
@@ -129,15 +142,15 @@ const runLocalScanner = (senderEmail: string, urlText: string, emailText: string
       
       if (domainInfo.status === "Typosquatting") {
         senderVerification = "Suspicious";
-        senderAnalysis = `Spoofing brand '${domainInfo.brand ? domainInfo.brand.charAt(0).toUpperCase() + domainInfo.brand.slice(1) : "Protected"}' in domain name`;
+        senderAnalysis = domainInfo.reason ? domainInfo.reason : "Impersonation domain";
         isPhishing = true;
         score = Math.max(score, 98.0);
-      } else if (["gmail.com", "yahoo.com", "hotmail.com", "outlook.com"].includes(domain)) {
+      } else if (freeEmailProviders.includes(domain)) {
         let isImpersonating = false;
         for (const brand of Object.keys(brandDomains)) {
           if (username.includes(brand)) {
             senderVerification = "Suspicious";
-            senderAnalysis = `Brand impersonation '${brand.charAt(0).toUpperCase() + brand.slice(1)}' using free email account`;
+            senderAnalysis = `Brand impersonation '${brand.charAt(0).toUpperCase() + brand.slice(1)}' using free email account (${domain})`;
             isPhishing = true;
             score = Math.max(score, 98.0);
             isImpersonating = true;
@@ -163,6 +176,7 @@ const runLocalScanner = (senderEmail: string, urlText: string, emailText: string
     const urlDomain = getDomain(urlText);
     const domainInfo = checkSpoof(urlDomain);
     const isHttp = urlText.toLowerCase().trim().startsWith("http://");
+    const hasIp = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/.test(urlDomain);
     
     if (domainInfo.status === "Typosquatting") {
       urlVerification = "Typosquatting";
@@ -172,18 +186,28 @@ const runLocalScanner = (senderEmail: string, urlText: string, emailText: string
       if (isHttp) {
         urlAnalysis += " (Also uses insecure unencrypted HTTP protocol)";
       }
+    } else if (hasIp) {
+      urlVerification = "Malicious";
+      urlAnalysis = "URL uses raw numerical IP address instead of domain";
+      isPhishing = true;
+      score = Math.max(score, 95.0);
     } else if (isHttp) {
       urlVerification = "Suspicious";
-      urlAnalysis = "Uses insecure unencrypted HTTP connection. Legitimate brands always use secure HTTPS for credentials.";
       isPhishing = true;
-      score = Math.max(score, 82.0); // 82% threat for plain unencrypted HTTP!
+      if (domainInfo.status === "Safe" && domainInfo.brand) {
+        urlAnalysis = "Uses insecure unencrypted HTTP connection. Legitimate brands always use secure HTTPS for credentials.";
+        score = Math.max(score, 82.0);
+      } else {
+        urlAnalysis = "Uses insecure unencrypted HTTP connection.";
+        score = Math.max(score, 65.0);
+      }
     } else if (domainInfo.status === "Safe" && domainInfo.brand) {
       urlVerification = "Safe";
       urlAnalysis = domainInfo.reason ? domainInfo.reason : "Official brand link";
     } else {
       urlVerification = "Unverified";
       urlAnalysis = "Unverified domain name";
-      const suspiciousTerms = ["login", "update", "verify", "secure", "free", "reset", "billing"];
+      const suspiciousTerms = ["login", "update", "verify", "secure", "free", "win", "claim", "reset", "billing", "invoice"];
       const matchedTerms: string[] = [];
       suspiciousTerms.forEach(t => {
         if (urlText.toLowerCase().includes(t)) matchedTerms.push(t);
@@ -194,6 +218,16 @@ const runLocalScanner = (senderEmail: string, urlText: string, emailText: string
         score = Math.max(score, 45.0 + 10 * matchedTerms.length);
       }
     }
+    
+    // Check suspicious TLDs
+    const suspiciousTldRegex = /\.(xyz|su|info|click|top|tk|cf|gq|ml|ga|work|bid|date|download)$/;
+    if (suspiciousTldRegex.test(urlDomain)) {
+      score = Math.max(score, 75.0);
+      if (urlVerification === "Safe") {
+        urlVerification = "Suspicious";
+      }
+      urlAnalysis += " (Hosted on a high-risk suspicious TLD)";
+    }
   }
   
   if (isPhishing || score > 45.0) {
@@ -201,12 +235,14 @@ const runLocalScanner = (senderEmail: string, urlText: string, emailText: string
     isPhishing = true;
   }
   
+  const explanation = `Diagnostic Report: This scan analyzed the transaction elements against known phishing tactics. The sender is classified as ${senderVerification} (${senderAnalysis}) and the URL is classified as ${urlVerification} (${urlAnalysis}). Legitimate companies never use spoofed domains or ask for credentials over unencrypted connections.`;
+  
   return {
     is_phishing: isPhishing,
     confidence_score: score,
     suspicious_words: suspiciousWords,
     classification,
-    ai_explanation: `Diagnostic: Our client-side analyzer flagged typosquatting indicators matching Flipkart or Amazon. Prepending prefixes or numbers (e.g. '11') is a common phishing technique. Verify official email addresses before trust.`,
+    ai_explanation: explanation,
     sender_verification: senderVerification,
     sender_analysis: senderAnalysis,
     url_verification: urlVerification,

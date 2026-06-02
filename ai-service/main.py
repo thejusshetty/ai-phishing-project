@@ -287,6 +287,142 @@ SUSPICIOUS_KEYWORDS = ["urgent", "verify", "click here", "suspend", "password", 
 def read_root():
     return {"status": "AI Service is running"}
 
+def run_fallback_scanner(text: str, url: str, sender_email: str) -> dict:
+    suspicious_words = []
+    keywords = ["urgent", "verify", "click here", "suspend", "password", "login", "unauthorized", "account", "update", "action required", "billing", "reset", "free", "win", "claim", "refund", "invoice"]
+    
+    text_lower = text.lower()
+    for w in keywords:
+        if w in text_lower:
+            suspicious_words.append(w)
+            
+    # Calculate base score from keywords
+    score = 5.0
+    if len(suspicious_words) == 1:
+        score = 25.0
+    elif len(suspicious_words) == 2:
+        score = 45.0
+    elif len(suspicious_words) >= 3:
+        score = 65.0
+        
+    is_phishing = False
+    classification = "Safe"
+    sender_verification = "Unverified"
+    sender_analysis = "Unverified domain name"
+    url_verification = "Safe"
+    url_analysis = "Safe destination domain"
+    
+    # 1. Analyze Sender Email
+    if sender_email and "@" in sender_email:
+        sender_email = sender_email.lower().strip()
+        parts = sender_email.split("@")
+        if len(parts) == 2:
+            username, domain = parts
+            domain_info = check_domain_for_spoofing(domain)
+            
+            if domain_info["status"] == "Typosquatting":
+                sender_verification = "Suspicious"
+                sender_analysis = domain_info["reason"]
+                is_phishing = True
+                score = max(score, 98.0)
+            elif domain in FREE_EMAIL_PROVIDERS:
+                is_impersonating = False
+                for brand in BRAND_DOMAINS.keys():
+                    if brand in username:
+                        sender_verification = "Suspicious"
+                        sender_analysis = f"Brand impersonation '{brand.capitalize()}' using free email account ({domain})"
+                        is_phishing = True
+                        score = max(score, 98.0)
+                        is_impersonating = True
+                        break
+                if not is_impersonating:
+                    sender_verification = "Unverified"
+                    sender_analysis = "Standard free email address"
+            elif domain_info["status"] == "Safe" and domain_info["brand"] is not None:
+                sender_verification = "Verified"
+                sender_analysis = f"Verified official {domain_info['brand'].capitalize()} domain"
+            else:
+                sender_verification = "Unverified"
+                sender_analysis = "Unverified third-party domain"
+                
+    # 2. Analyze URL
+    if url:
+        url_lower = url.lower().strip()
+        url_domain = extract_domain(url_lower)
+        if not url_domain and "." in url_lower:
+            url_domain = url_lower.replace("https://", "").replace("http://", "").split("/")[0]
+            
+        domain_info = check_domain_for_spoofing(url_domain)
+        is_http = url_lower.startswith("http://")
+        
+        # Check IP address usage
+        has_ip = re.search(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', url_lower)
+        
+        if domain_info["status"] == "Typosquatting":
+            url_verification = "Typosquatting"
+            url_analysis = domain_info["reason"]
+            is_phishing = True
+            score = max(score, 98.5)
+            if is_http:
+                url_analysis += " (Also uses insecure unencrypted HTTP protocol)"
+        elif has_ip:
+            url_verification = "Malicious"
+            url_analysis = "URL uses raw numerical IP address instead of domain"
+            is_phishing = True
+            score = max(score, 95.0)
+        elif is_http:
+            url_verification = "Suspicious"
+            url_analysis = "Uses insecure unencrypted HTTP connection. Legitimate brands always use secure HTTPS for credentials."
+            is_phishing = True
+            score = max(score, 82.0)
+        elif domain_info["status"] == "Safe" and domain_info["brand"] is not None:
+            url_verification = "Safe"
+            url_analysis = domain_info["reason"]
+        else:
+            url_verification = "Unverified"
+            url_analysis = "Unverified domain name"
+            suspicious_url_keywords = ["login", "update", "verify", "secure", "free", "win", "claim", "reset", "billing", "invoice"]
+            found_kw = []
+            for kw in suspicious_url_keywords:
+                if kw in url_lower:
+                    found_kw.append(kw)
+            if found_kw:
+                url_verification = "Suspicious"
+                url_analysis = f"Suspicious terms in URL path: {', '.join(found_kw)}"
+                score = max(score, 45.0 + 10 * len(found_kw))
+                
+        # Check suspicious TLDs
+        suspicious_tld_regex = r'\.(xyz|su|info|click|top|tk|cf|gq|ml|ga|work|bid|date|download)$'
+        if re.search(suspicious_tld_regex, url_domain):
+            score = max(score, 75.0)
+            if url_verification == "Safe":
+                url_verification = "Suspicious"
+            url_analysis += " (Hosted on a high-risk suspicious TLD)"
+            
+    if is_phishing or score > 45.0:
+        classification = "Phishing" if score > 70.0 else "Suspicious"
+        is_phishing = True
+    else:
+        classification = "Safe"
+        
+    explanation = (
+        f"Diagnostic Report: This scan analyzed the transaction elements against known phishing tactics. "
+        f"The sender is classified as {sender_verification} ({sender_analysis}) and the URL is classified as {url_verification} ({url_analysis}). "
+        f"Legitimate companies never use spoofed domains or ask for credentials over unencrypted connections."
+    )
+    
+    return {
+        "is_phishing": is_phishing,
+        "confidence_score": round(score, 2),
+        "suspicious_words": suspicious_words,
+        "classification": classification,
+        "ai_explanation": explanation,
+        "sender_verification": sender_verification,
+        "sender_analysis": sender_analysis,
+        "url_verification": url_verification,
+        "url_analysis": url_analysis
+    }
+
 @app.post("/predict", response_model=AnalyzeResponse)
 def predict(req: AnalyzeRequest):
     # 1. First attempt structured Expert analysis via Gemini
@@ -305,112 +441,18 @@ def predict(req: AnalyzeRequest):
             url_analysis=str(expert_analysis["url_analysis"])
         )
         
-    # 2. Fallback to Local Heuristics + Machine Learning pipeline
-    if not model:
-        raise HTTPException(status_code=500, detail="Fallback Model not loaded and Gemini unavailable")
-        
-    combined_text = f"{req.text} {req.url} {req.sender_email}"
-    probabilities = model.predict_proba([combined_text])[0]
-    phishing_prob = probabilities[1]
+    # 2. Fallback to Local Heuristics scanner (Guarantees absolute consistency)
+    fallback_res = run_fallback_scanner(req.text, req.url, req.sender_email)
     
-    heuristic_penalty = 0.0
-    
-    # Run fallback sender validation
-    sender_info = analyze_sender_email(req.sender_email)
-    sender_verification = sender_info["status"]
-    sender_analysis = sender_info["reason"]
-    if sender_verification == "Suspicious":
-        heuristic_penalty += 0.8
-        
-    # Run fallback URL validation
-    url_lower = req.url.lower().strip()
-    url_verification = "Safe"
-    url_analysis = "No URL provided"
-    
-    if url_lower:
-        # Pre-process domain check
-        url_domain = extract_domain(url_lower)
-        if not url_domain and "." in url_lower:
-            url_domain = url_lower.replace("https://", "").replace("http://", "").split("/")[0]
-            
-        domain_info = check_domain_for_spoofing(url_domain)
-        is_http = url_lower.startswith("http://")
-        
-        if domain_info["status"] == "Typosquatting":
-            url_verification = "Typosquatting"
-            url_analysis = domain_info["reason"]
-            heuristic_penalty += 0.85
-            if is_http:
-                url_analysis += " (Uses insecure HTTP connection)"
-        elif is_http:
-            url_verification = "Suspicious"
-            url_analysis = "Uses insecure, unencrypted HTTP connection. Legitimate brands always use HTTPS."
-            heuristic_penalty += 0.8
-        elif domain_info["brand"] is not None:
-            url_verification = "Safe"
-            url_analysis = domain_info["reason"]
-        else:
-            url_verification = "Unverified"
-            url_analysis = "Unverified domain name"
-            suspicious_url_keywords = ["login", "update", "verify", "secure", "account", "bank", "free", "win", "claim", "reset", "billing"]
-            found_kw = []
-            for kw in suspicious_url_keywords:
-                if kw in url_lower:
-                    found_kw.append(kw)
-            if found_kw:
-                heuristic_penalty += 0.25 * len(found_kw)
-                url_verification = "Suspicious"
-                url_analysis = f"Suspicious terms in URL path: {', '.join(found_kw)}"
-                
-        # Check IP address usage
-        if re.search(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', url_lower):
-            heuristic_penalty += 0.4
-            url_verification = "Malicious"
-            url_analysis = "URL uses raw numerical IP address instead of domain"
-            
-    final_phishing_prob = min(1.0, phishing_prob + heuristic_penalty)
-    if sender_verification == "Suspicious" or url_verification in ["Typosquatting", "Malicious"]:
-        final_phishing_prob = max(final_phishing_prob, 0.90)
-        
-    is_phishing = final_phishing_prob > 0.45
-    if final_phishing_prob > 0.70:
-        classification = "Phishing"
-    elif final_phishing_prob > 0.30:
-        classification = "Suspicious"
-    else:
-        classification = "Safe"
-        
-    found_words = []
-    lower_text = req.text.lower()
-    for word in SUSPICIOUS_KEYWORDS:
-        if word in lower_text:
-            found_words.append(word)
-            
-    explanation = None
-    if is_phishing:
-        # Mini fallback prompt
-        prompt_fallback = f"Analyze this email and URL for phishing red flags. Provide a short, 2-3 sentence micro-training explanation for the user on why this specific attempt is suspicious. Focus only on the explanation. Email: {req.text} URL: {req.url}"
-        try:
-            response = requests.post(
-                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}",
-                json={"contents": [{"parts": [{"text": prompt_fallback}]}]},
-                headers={"Content-Type": "application/json"},
-                timeout=5
-            )
-            data = response.json()
-            if "candidates" in data and len(data["candidates"]) > 0:
-                explanation = data["candidates"][0]["content"]["parts"][0]["text"]
-        except Exception:
-            pass
-            
     return AnalyzeResponse(
-        is_phishing=is_phishing,
-        confidence_score=round(final_phishing_prob * 100, 2),
-        suspicious_words=found_words,
-        classification=classification,
-        ai_explanation=explanation,
-        sender_verification=sender_verification,
-        sender_analysis=sender_analysis,
-        url_verification=url_verification,
-        url_analysis=url_analysis
+        is_phishing=fallback_res["is_phishing"],
+        confidence_score=fallback_res["confidence_score"],
+        suspicious_words=fallback_res["suspicious_words"],
+        classification=fallback_res["classification"],
+        ai_explanation=fallback_res["ai_explanation"],
+        sender_verification=fallback_res["sender_verification"],
+        sender_analysis=fallback_res["sender_analysis"],
+        url_verification=fallback_res["url_verification"],
+        url_analysis=fallback_res["url_analysis"]
     )
+
