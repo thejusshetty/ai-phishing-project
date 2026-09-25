@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 128" fill="none">
+  <rect width="192" height="128" rx="16" fill="#0d0e12"/>
+  <defs>
+    <radialGradient id="flowerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.4)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,0.1)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <linearGradient id="stemGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.2)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.8)"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Glow -->
+  <circle cx="96" cy="64" r="56" fill="url(#flowerGlow)"/>
+
+  <!-- Stylized Monochromatic Flower Stem and Leaves -->
+  <path d="M96 110 Q96 75 96 55" stroke="url(#stemGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M96 85 Q115 78 122 84 Q112 95 96 87" fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+  <path d="M96 75 Q77 68 70 74 Q80 85 96 77" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+
+  <!-- Botanical Bloom Petals -->
+  <g transform="translate(96,50)">
+    <path d="M0 0 C-18 -25 -25 -40 0 -45 C25 -40 18 -25 0 0" fill="rgba(255,255,255,0.75)" stroke="rgba(255,255,255,0.9)" stroke-width="0.8"/>
+    <path d="M0 0 C-35 -15 -42 -2 0 0" fill="rgba(255,255,255,0.55)" stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+    <path d="M0 0 C35 -15 42 -2 0 0" fill="rgba(255,255,255,0.55)" stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+    <path d="M0 0 C-25 18 -15 32 0 0" fill="rgba(255,255,255,0.65)" stroke="rgba(255,255,255,0.8)" stroke-width="0.8"/>
+    <path d="M0 0 C25 18 15 32 0 0" fill="rgba(255,255,255,0.65)" stroke="rgba(255,255,255,0.8)" stroke-width="0.8"/>
+    <circle cx="0" cy="0" r="5" fill="#ffffff"/>
+  </g>
+</svg>

@@ -10,18 +10,18 @@ text,label
 "Are you available for a quick call?",0
 "Important updates to our privacy policy. https://www.google.com/policies",0
 "Action Required: Your package delivery failed. Verify your address. http://dhl-delivery-failed-update.net",1
-"Exclusive offer just for you, buy one get one free! http://amazing-deals.com/promo",0
+"Exclusive offer just for you, buy one get one free! https://amazon.com/deals",0
 "Warning: Your mailbox is full. Upgrade your quota here. http://mail-quota-update.com/login",1
-"Let's grab lunch later.",0
+"Let's grab lunch later at 1pm.",0
 "Verify your email to continue using our services. http://verify-account-security.com",1
 "Weekly team sync agenda https://docs.google.com/document/d/123",0
-"Please sign this document https://docusign.net/sign/123",0
+"Please sign this employment contract via DocuSign https://docusign.net/sign/123",0
 "Your bank account has been locked. Verify identity http://chase-bank-verify-identity.com",1
 "New comment on your Jira ticket https://jira.company.com/browse/ENG-123",0
 "Claim your tax refund now! Click the link http://irs-tax-refund-claim.gov.su",1
 "Your Netflix membership is on hold. Update payment http://netflix-billing-update-secure.com",1
 "Please approve my pull request https://github.com/company/repo/pull/1",0
-"Your Amazon order has shipped! Track it here https://amazon.com/orders",0
+"Your Amazon order has shipped! Track it here https://amazon.in/orders",0
 "Unusual sign-in activity detected. Review now http://microsoft-secure-login-alert.com",1
 "Happy birthday! Here is a gift card from the team",0
 "Your Apple ID has been locked for security reasons http://apple-id-unlock-verify.com",1
@@ -44,3 +44,58 @@ text,label
 "You are eligible for a government grant. Apply here http://gov-grant-application-free.info",1
 "Did you see the latest news article? https://nytimes.com/article",0
 "Your payment failed. Update billing information http://billing-update-failed-payment.com",1
+"URGENT: Unusual sign-in attempt detected on your Amazon account. Verify password http://amazon00.com/account/verify",1
+"Congratulations! You have been selected for a free Flipkart gift voucher. Claim here: http://11flipkart.com/claim-reward",1
+"Security Alert: Unauthorized login from unrecognized device. Reset credentials http://192.168.1.105/auth/reset",1
+"Alex shared a document with you: Q3 Financial Review.pdf. Open Google Drive https://drive.google.com/file/d/1X9b0K7mZ",0
+"Your Amazon package has been dispatched and will arrive tomorrow. Track online https://amazon.in/orders/track-package",0
+"URGENT NOTICE: Suspicious transaction of $850 detected on your credit card. Cancel immediately http://bank-card-fraud-alert.info",1
+"Your Microsoft 365 password will expire in 2 hours. Keep your existing password http://microsoft-password-keep.net",1
+"Congratulations winner! Claim your lottery payout of $50,000 now http://claim-lottery-payout-online.xyz",1
+"Official Slack notification: You were mentioned in #general https://slack.com/archives/general",0
+"Here is the slide deck for tomorrow's client presentation https://slides.google.com/presentation/d/456",0
+"HR Portal: Please review the updated company holiday calendar for 2026 https://hr.internal.company.com/holidays",0
+"CRITICAL: Your PayPal account has been limited due to suspicious activity. Verify now http://paypal-resolution-center-auth.com",1
+"Your Uber ride receipt: $14.20 paid with Visa https://uber.com/trips/receipt",0
+"FedEx Delivery: Your package could not be delivered. Confirm address fee: $1.99 http://fedex-package-reschedule-fee.com",1
+"Quick reminder about the all-hands meeting at 3 PM today in Conference Room A",0
+"Verify your WhatsApp account to keep using voice and video calling http://whatsapp-verification-service.top",1
+"Hi team, sharing the sprint backlog for next week https://trello.com/b/sprint-14",0
+"SECURITY WARNING: Malware detected on your workstation. Download scanner now http://antivirus-security-fix-update.org",1
+"Github notification: Dependabot alerts resolved in main branch https://github.com/org/repo/security",0
+"Your Spotify Family subscription needs payment method confirmation http://spotify-billing-fix.net",1
+"Here are the photos from our weekend trip! https://photos.google.com/share/abc",0
+"FINAL WARNING: Your tax return has inconsistencies. Settle tax penalty immediately http://irs-penalty-settlement-gov.click",1
+"Thanks for dining with us! Review your OpenTable reservation https://opentable.com/booking",0
+"Emergency Payroll Alert: Direct deposit information missing. Update bank details http://payroll-direct-deposit-portal.com",1
+"Here is the PDF copy of your flight boarding pass https://united.com/boardingpass",0
+"Your monthly AWS cloud billing statement is ready for download https://console.aws.amazon.com/billing",0
+"Action Required: Confirm your wire transfer of $4,500.00 to avoid cancellation http://wire-transfer-authorization-sec.top",1
+"Hi, are you free this afternoon to review the Q4 marketing plan?",0
+"Critical Security Patch required for your Windows system. Install immediately http://windows-update-patch-download.xyz",1
+"Your Starbucks rewards account balance update https://starbucks.com/rewards",0
+"URGENT: Suspicious activity on Wells Fargo debit card. Unlock your card here http://wellsfargo-debit-unlock.net",1
+"Your doctor's appointment reminder for Thursday at 10:00 AM",0
+"ATTENTION: You have 1 unread message from HR regarding salary adjustment http://hr-portal-salary-review.info",1
+"Here are the design tokens and Figma components https://figma.com/@designsystem",0
+"Your Apple iCloud storage is full. Claim 50GB free bonus storage http://apple-icloud-quota-upgrade.click",1
+"Thanks for submitting your expense report on Expensify https://expensify.com/reports",0
+"IRS Notice: Unclaimed tax rebate of $1,200 waiting. Submit banking details http://irs-tax-rebate-portal.org.su",1
+"Reminder: Quarterly company townhall starts in 15 minutes",0
+"Your Binance cryptocurrency withdrawal has been initiated. If not you, cancel here http://binance-cancel-withdrawal-alert.io",1
+"Here is the updated roadmap spreadsheet https://docs.google.com/spreadsheets/d/789",0
+"Your McAfee Antivirus subscription renewed for $399. Click here to dispute charge http://mcafee-refund-billing-dispute.com",1
+"Let me know if you need help with the onboarding tasks",0
+"Bank of America Alert: Unusual login from Russia. Verify your account http://bankofamerica-secure-auth-login.com",1
+"Your Spotify Wrapped is here! Check out your top songs https://spotify.com/wrapped",0
+"ATTENTION: Your USPS package address was incomplete. Update address http://usps-redelivery-address-confirm.top",1
+"Project status report for Week 38 is attached",0
+"Emergency Alert: Your Zoom account will be deactivated unless verified http://zoom-video-account-verify.net",1
+"Thanks for ordering on DoorDash! Track your dasher https://doordash.com/orders",0
+"Security Warning: Attempted login to your Coinbase wallet. Block device http://coinbase-device-verification-sec.xyz",1
+"Can you approve the budget request in Workday? https://workday.company.com/inbox",0
+"Your DHL tracking number is 9876543210. Package arriving today https://dhl.com/track",0
+"Congratulations! You won the European International Lottery of €100,000 http://euro-lottery-claim-prize.top",1
+"Let's sync up on Monday morning regarding the launch checklist",0
+"Your LinkedIn connection request from David Miller https://linkedin.com/in/david-miller",0
+"CRITICAL: Unauthorized transfer of $2,300 detected on Chase account http://chase-fraud-prevention-desk.com",1

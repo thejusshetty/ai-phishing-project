@@ -6,21 +6,47 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
+      borderRadius: {
+        DEFAULT: '0.75rem',
+      },
       colors: {
-        background: "#05050f",
-        foreground: "#f8fafc",
-        primary: "#3b82f6",
-        primaryGlow: "rgba(59, 130, 246, 0.5)",
-        danger: "#f43f5e",
-        warning: "#f59e0b",
-        success: "#10b981",
-        darkAccent: "#0f172a",
-        glass: "rgba(15, 23, 42, 0.6)",
+        background: "#08090e",
+        foreground: "#f1f5f9",
+        surface: "#0f111a",
+        surfaceRaised: "#151824",
+        surfaceBorder: "rgba(255, 255, 255, 0.08)",
+        primary: {
+          DEFAULT: "#2563eb",
+          hover: "#1d4ed8",
+          light: "#3b82f6",
+          dark: "#1e40af",
+        },
+        cyan: {
+          DEFAULT: "#06b6d4",
+          light: "#22d3ee",
+        },
+        danger: {
+          DEFAULT: "#f43f5e",
+          light: "#fb7185",
+          dark: "#be123c",
+        },
+        warning: {
+          DEFAULT: "#f59e0b",
+          light: "#fbbf24",
+        },
+        success: {
+          DEFAULT: "#10b981",
+          light: "#34d399",
+        },
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out forwards',
-        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'pulse-glow': 'pulseGlow 2s infinite',
+        'fade-in': 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'pulse-subtle': 'pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         fadeIn: {
@@ -28,12 +54,12 @@ module.exports = {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        pulseGlow: {
-          '0%, 100%': { opacity: '1', filter: 'brightness(1)' },
-          '50%': { opacity: '0.8', filter: 'brightness(1.2) drop-shadow(0 0 10px rgba(59,130,246,0.8))' },
+        pulseSubtle: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.6' },
         }
       }
     },

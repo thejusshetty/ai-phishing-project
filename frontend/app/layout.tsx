@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-
-const outfit = Outfit({ subsets: ["latin"] });
+import AppShell from "@/components/AppShell";
 
 export const metadata: Metadata = {
-  title: "Human Risk & Phishing Defense Platform",
-  description: "AI-powered cybersecurity platform",
+  title: "PhishGuard AI — Advanced Threat Simulation & Human Risk Scoring",
+  description: "Real-time multi-vector phishing simulation, Levenshtein typosquatting scanner, and SOC cybersecurity telemetry.",
 };
 
 export default function RootLayout({
@@ -16,12 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${outfit.className} min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-primary/30`}>
-        <Navbar />
-        <main className="flex-1 container mx-auto p-4 md:p-8 animate-fade-in">
-          {children}
-        </main>
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-[#08090e] text-white antialiased font-sans">
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

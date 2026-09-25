@@ -1,7 +1,19 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { AlertTriangle, BookOpen, XCircle, ShieldAlert, ShieldCheck, Mail, Globe, CheckCircle, HelpCircle } from 'lucide-react';
+import { useEffect, useState } from "react";
+import {
+  ShieldAlert,
+  ShieldCheck,
+  AlertTriangle,
+  Mail,
+  Globe,
+  BookOpen,
+  X,
+  CheckCircle2,
+  Lightbulb,
+  Sparkles,
+  ArrowRight
+} from "lucide-react";
 
 interface TrainingModalProps {
   isOpen: boolean;
@@ -10,14 +22,14 @@ interface TrainingModalProps {
 }
 
 export default function TrainingModal({ isOpen, onClose, result }: TrainingModalProps) {
-  const [animatedProgress, setAnimatedProgress] = useState(0);
+  const [animatedScore, setAnimatedScore] = useState(0);
 
   useEffect(() => {
     if (isOpen && result) {
-      setAnimatedProgress(0);
+      setAnimatedScore(0);
       const timer = setTimeout(() => {
-        setAnimatedProgress(result.confidence_score || 0);
-      }, 100);
+        setAnimatedScore(result.confidence_score || 0);
+      }, 150);
       return () => clearTimeout(timer);
     }
   }, [isOpen, result]);
@@ -26,142 +38,172 @@ export default function TrainingModal({ isOpen, onClose, result }: TrainingModal
 
   const isPhishing = result.is_phishing;
   const isSuspicious = result.classification === "Suspicious";
-  
-  // Theme styling based on classification
-  let headerBg = "bg-success/15 border-success/30 text-success";
-  let progressColor = "bg-success";
-  let statusIcon = <ShieldCheck className="text-success animate-bounce" size={24} />;
-  
+
+  let statusConfig = {
+    title: "Safe Interaction Verified",
+    subtitle: "No malicious threat patterns or typosquatting detected.",
+    badgeClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+    headerBg: "bg-emerald-500/10 border-emerald-500/20",
+    barColor: "bg-emerald-500",
+    textColor: "text-emerald-400",
+    icon: ShieldCheck,
+  };
+
   if (isPhishing) {
-    headerBg = "bg-danger/15 border-danger/30 text-danger";
-    progressColor = "bg-danger";
-    statusIcon = <ShieldAlert className="text-danger animate-pulse" size={24} />;
+    statusConfig = {
+      title: "Security Threat: Phishing Attack Detected",
+      subtitle: "High probability malicious communication engineered to steal data or credentials.",
+      badgeClass: "bg-rose-500/10 text-rose-400 border-rose-500/30",
+      headerBg: "bg-rose-500/10 border-rose-500/20",
+      barColor: "bg-rose-500",
+      textColor: "text-rose-400",
+      icon: ShieldAlert,
+    };
   } else if (isSuspicious) {
-    headerBg = "bg-warning/15 border-warning/30 text-warning";
-    progressColor = "bg-warning";
-    statusIcon = <AlertTriangle className="text-warning" size={24} />;
+    statusConfig = {
+      title: "Caution: Suspicious Elements Flagged",
+      subtitle: "Unverified domain or manipulation keywords detected.",
+      badgeClass: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+      headerBg: "bg-amber-500/10 border-amber-500/20",
+      barColor: "bg-amber-500",
+      textColor: "text-amber-400",
+      icon: AlertTriangle,
+    };
   }
 
-  // Get status badges
+  const StatusIcon = statusConfig.icon;
+
   const getSenderBadge = (status: string) => {
     switch (status) {
-      case 'Verified':
-        return <span className="text-[10px] px-2.5 py-1 rounded-full bg-success/10 text-success border border-success/30 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(16,185,129,0.15)]">Verified Brand</span>;
-      case 'Suspicious':
-        return <span className="text-[10px] px-2.5 py-1 rounded-full bg-danger/10 text-danger border border-danger/30 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(244,63,94,0.15)]">Suspicious Fake</span>;
+      case "Verified":
+        return <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 uppercase">Verified Official</span>;
+      case "Suspicious":
+        return <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 uppercase">Impersonation</span>;
       default:
-        return <span className="text-[10px] px-2.5 py-1 rounded-full bg-warning/10 text-warning border border-warning/30 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(245,158,11,0.15)]">Unverified Domain</span>;
+        return <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase">Unverified Domain</span>;
     }
   };
 
   const getUrlBadge = (status: string) => {
     switch (status) {
-      case 'Safe':
-        return <span className="text-[10px] px-2.5 py-1 rounded-full bg-success/10 text-success border border-success/30 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(16,185,129,0.15)]">Safe Link</span>;
-      case 'Typosquatting':
-        return <span className="text-[10px] px-2.5 py-1 rounded-full bg-danger/10 text-danger border border-danger/30 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(244,63,94,0.15)]">Typosquatting</span>;
-      case 'Malicious':
-        return <span className="text-[10px] px-2.5 py-1 rounded-full bg-danger/10 text-danger border border-danger/30 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(244,63,94,0.15)]">Malicious IP</span>;
-      case 'Suspicious':
-        return <span className="text-[10px] px-2.5 py-1 rounded-full bg-danger/10 text-danger border border-danger/30 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(244,63,94,0.15)]">Suspicious URL</span>;
+      case "Safe":
+        return <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 uppercase">Safe Domain</span>;
+      case "Typosquatting":
+        return <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 uppercase">Typosquatting</span>;
+      case "Malicious":
+        return <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 uppercase">Raw IP Address</span>;
+      case "Suspicious":
+        return <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase">Suspicious Link</span>;
       default:
-        return <span className="text-[10px] px-2.5 py-1 rounded-full bg-warning/10 text-warning border border-warning/30 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(245,158,11,0.15)]">Unverified</span>;
+        return <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-500/15 text-slate-300 border border-slate-500/30 uppercase">Unverified</span>;
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-fade-in">
-      <div className="glass-panel w-full max-w-2xl bg-gradient-to-b from-[#0e0e16] to-[#06060c] border border-white/10 rounded-3xl overflow-hidden shadow-[0_35px_60px_-15px_rgba(0,0,0,0.9)] animate-slide-up duration-300 relative flex flex-col">
-        
-        {/* Dynamic header */}
-        <div className={`p-5 flex items-center justify-between border-b border-white/5 ${headerBg}`}>
-          <div className="flex items-center gap-3">
-            {statusIcon}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
+      <div className="surface-card w-full max-w-2xl bg-[#0c0e17] border border-white/[0.12] rounded-2xl overflow-hidden shadow-2xl animate-slide-up flex flex-col max-h-[90vh]">
+
+        {/* Header Banner */}
+        <div className={`p-4 sm:p-5 flex items-start justify-between border-b ${statusConfig.headerBg}`}>
+          <div className="flex items-start gap-3">
+            <div className={`p-2 rounded-xl bg-black/40 border border-white/[0.08] ${statusConfig.textColor}`}>
+              <StatusIcon size={22} />
+            </div>
             <div>
-              <h3 className="text-xl font-extrabold tracking-tight">
-                {isPhishing ? "Security Alert: Phishing Detected" : isSuspicious ? "Warning: Highly Suspicious" : "Verification: Safe Interaction"}
+              <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                {statusConfig.title}
               </h3>
-              <p className="text-xs opacity-75">Sandboxed Phishing Diagnostics Assessment</p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {statusConfig.subtitle}
+              </p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/5 border border-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-colors text-sm"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+            aria-label="Close dialog"
           >
-            ✕
+            <X size={18} />
           </button>
         </div>
-        
-        <div className="p-6 md:p-8 flex flex-col gap-6 overflow-y-auto max-h-[80vh]">
-          
-          {/* Big Risk Indicator */}
-          <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl"></div>
+
+        {/* Modal Body */}
+        <div className="p-5 sm:p-6 overflow-y-auto flex flex-col gap-5 text-slate-300">
+
+          {/* Threat Metric Bar */}
+          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Calculated Threat Level</h4>
-              <div className="text-3xl font-black text-white tracking-tight flex items-baseline gap-2">
-                <span className={`text-4xl ${isPhishing ? 'text-danger' : isSuspicious ? 'text-warning' : 'text-success'}`}>
-                  {result.classification}
+              <span className="text-[11px] font-bold uppercase text-slate-400 tracking-wider block">
+                Calculated Threat Probability
+              </span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className={`text-2xl font-black ${statusConfig.textColor}`}>
+                  {result.classification || "Scanned"}
                 </span>
-                <span className="text-gray-400 text-lg">({result.confidence_score}%)</span>
+                <span className="text-xs text-slate-400 font-mono font-semibold">
+                  ({animatedScore.toFixed(1)}% Threat Score)
+                </span>
               </div>
             </div>
-            
-            {/* Elegant progress meter */}
-            <div className="w-full md:w-1/2 flex flex-col gap-2">
-              <div className="flex justify-between text-xs text-gray-400 font-semibold uppercase tracking-wider">
-                <span>Safe</span>
-                <span>Highly Dangerous</span>
+
+            <div className="w-full sm:w-1/2 flex flex-col gap-1.5">
+              <div className="flex justify-between text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                <span>Safe (0%)</span>
+                <span>High Threat (100%)</span>
               </div>
-              <div className="w-full h-3 bg-black/60 border border-white/5 rounded-full overflow-hidden">
-                <div 
-                  className={`h-full ${progressColor} transition-all duration-1000 ease-out rounded-full shadow-[0_0_15px_rgba(244,63,94,0.4)]`}
-                  style={{ width: `${animatedProgress}%` }}
+              <div className="w-full h-2.5 bg-black/60 rounded-full overflow-hidden border border-white/[0.05]">
+                <div
+                  className={`h-full ${statusConfig.barColor} transition-all duration-700 ease-out rounded-full`}
+                  style={{ width: `${Math.min(100, Math.max(5, animatedScore))}%` }}
                 ></div>
               </div>
             </div>
           </div>
 
-          {/* Security Diagnostics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Sender email analysis */}
-            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-colors flex flex-col gap-3.5 group">
+          {/* Forensic Breakdown Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            {/* Sender Domain Analysis */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 font-bold text-sm text-gray-300">
-                  <Mail size={16} className="text-primary group-hover:scale-110 transition-transform" />
-                  <span>Sender Verification</span>
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
+                  <Mail size={14} className="text-primary-light" />
+                  <span>Sender Authenticity</span>
                 </div>
                 {getSenderBadge(result.sender_verification)}
               </div>
-              <div className="bg-black/40 border border-white/5 rounded-xl p-3 text-xs text-gray-400 min-h-[50px] flex items-center">
-                {result.sender_analysis || "No sender email analysis was triggered."}
-              </div>
+              <p className="text-xs text-slate-400 bg-black/40 p-2.5 rounded-lg border border-white/[0.04] leading-relaxed">
+                {result.sender_analysis || "Standard domain format analyzed."}
+              </p>
             </div>
 
-            {/* URL/Link analysis */}
-            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-colors flex flex-col gap-3.5 group">
+            {/* URL & Link Analysis */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 font-bold text-sm text-gray-300">
-                  <Globe size={16} className="text-primary group-hover:scale-110 transition-transform" />
-                  <span>Destination URL Scan</span>
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
+                  <Globe size={14} className="text-primary-light" />
+                  <span>Destination Link Scan</span>
                 </div>
                 {getUrlBadge(result.url_verification)}
               </div>
-              <div className="bg-black/40 border border-white/5 rounded-xl p-3 text-xs text-gray-400 min-h-[50px] flex items-center font-mono">
-                {result.url_analysis || "No URL analysis was triggered."}
-              </div>
+              <p className="text-xs text-slate-400 bg-black/40 p-2.5 rounded-lg border border-white/[0.04] leading-relaxed font-mono">
+                {result.url_analysis || "No destination URL was present."}
+              </p>
             </div>
           </div>
 
-          {/* Suspicious Keywords */}
+          {/* Urgency Trigger Keywords */}
           {result.suspicious_words && result.suspicious_words.length > 0 && (
-            <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-4">
-              <span className="text-xs text-gray-400 font-bold uppercase tracking-widest block mb-2.5">
-                Urgency & Manipulation Indicators Found:
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <span className="text-[11px] font-bold uppercase text-slate-400 tracking-wider block mb-2">
+                Psychological Manipulation Keywords Detected:
               </span>
-              <div className="flex gap-2.5 flex-wrap">
+              <div className="flex flex-wrap gap-1.5">
                 {result.suspicious_words.map((word: string, i: number) => (
-                  <span key={i} className="px-3 py-1.5 bg-warning/10 text-warning text-xs font-semibold rounded-lg border border-warning/20 shadow-[0_0_8px_rgba(245,158,11,0.05)]">
+                  <span
+                    key={i}
+                    className="text-xs font-semibold px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/25"
+                  >
                     "{word}"
                   </span>
                 ))}
@@ -169,40 +211,31 @@ export default function TrainingModal({ isOpen, onClose, result }: TrainingModal
             </div>
           )}
 
-          {/* Gemini AI explanation */}
-          {isPhishing && (
-            <div className="bg-gradient-to-tr from-primary/10 to-purple-600/10 border border-primary/20 rounded-2xl p-5 md:p-6 flex gap-4 items-start relative overflow-hidden shadow-[0_12px_30px_rgba(99,102,241,0.1)] group">
-              {/* background glow */}
-              <div className="absolute -top-12 -left-12 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
-              
-              <div className="p-2.5 bg-primary/20 text-primary rounded-xl border border-primary/30 shrink-0 group-hover:rotate-6 transition-transform">
-                <BookOpen size={20} className="text-blue-400" />
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3.5 flex-wrap">
-                  <h4 className="font-extrabold text-sm text-blue-300 tracking-tight">✨ AI Security Insight</h4>
-                  {result.ai_explanation && (
-                    <span className="text-[9px] font-bold uppercase tracking-widest bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-2 py-0.5 rounded-md shadow-[0_4px_10px_rgba(59,130,246,0.3)]">
-                      Gemini Guided Training
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs md:text-sm text-gray-300 leading-relaxed font-normal">
-                  {result.ai_explanation 
-                    ? result.ai_explanation 
-                    : "Always verify the sender's email address and hover over links before clicking. Look out for urgent language designed to make you panic."}
-                </p>
-              </div>
+          {/* Educational AI Insight & Training */}
+          <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 flex gap-3 items-start">
+            <div className="p-2 rounded-lg bg-primary/20 text-primary-light shrink-0">
+              <Lightbulb size={18} />
             </div>
-          )}
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-bold text-primary-light flex items-center gap-1">
+                <Sparkles size={12} /> Defensive Cyber Training Tip
+              </span>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {result.ai_explanation ||
+                  (isPhishing
+                    ? "Never click links from unexpected emails asking for urgent credential verification. Always navigate directly to the official website in a separate tab."
+                    : "Legitimate organizations communicate using verified corporate domains over HTTPS. Keep inspecting sender headers regularly.")}
+              </p>
+            </div>
+          </div>
 
-          {/* Apple-style Action Close */}
-          <button 
+          {/* Action Button */}
+          <button
             onClick={onClose}
-            className="w-full mt-2 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-4 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.4)] transition-all duration-300 active:scale-[0.99] text-sm uppercase tracking-wider border border-white/5 hover:border-white/10"
+            className="w-full bg-primary hover:bg-primary-hover text-white text-xs font-bold py-3 rounded-xl transition-all shadow-md shadow-primary/25 flex items-center justify-center gap-1.5"
           >
-            I Understand
+            <span>Acknowledge & Continue</span>
+            <ArrowRight size={14} />
           </button>
         </div>
       </div>

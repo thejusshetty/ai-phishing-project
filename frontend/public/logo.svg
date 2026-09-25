@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <circle cx="50" cy="50" r="48" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  <g transform="translate(50,50)">
+    <!-- 8 Petals Radial Bloom -->
+    <ellipse cx="0" cy="-22" rx="9" ry="18" fill="rgba(255,255,255,0.85)" transform="rotate(0)"/>
+    <ellipse cx="0" cy="-22" rx="9" ry="18" fill="rgba(255,255,255,0.7)" transform="rotate(45)"/>
+    <ellipse cx="0" cy="-22" rx="9" ry="18" fill="rgba(255,255,255,0.85)" transform="rotate(90)"/>
+    <ellipse cx="0" cy="-22" rx="9" ry="18" fill="rgba(255,255,255,0.7)" transform="rotate(135)"/>
+    <ellipse cx="0" cy="-22" rx="9" ry="18" fill="rgba(255,255,255,0.85)" transform="rotate(180)"/>
+    <ellipse cx="0" cy="-22" rx="9" ry="18" fill="rgba(255,255,255,0.7)" transform="rotate(225)"/>
+    <ellipse cx="0" cy="-22" rx="9" ry="18" fill="rgba(255,255,255,0.85)" transform="rotate(270)"/>
+    <ellipse cx="0" cy="-22" rx="9" ry="18" fill="rgba(255,255,255,0.7)" transform="rotate(315)"/>
+    <!-- Center Core -->
+    <circle cx="0" cy="0" r="10" fill="#ffffff"/>
+    <circle cx="0" cy="0" r="5" fill="rgba(0,0,0,0.2)"/>
+  </g>
+</svg>
